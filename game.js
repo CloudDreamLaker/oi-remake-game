@@ -223,6 +223,14 @@ const contestConfigs = {
   
 };
 
+function getMentalDropPercent(mental) {
+  let x = (mental + 1.) / 2;
+  let p = Math.log(x) / (Math.log(x) + 1);
+  p = Math.max(p, -1);
+  logEvent(`调试信息，心理素质：${mental}，心态减小比例 ${p}`)
+  return p;
+}
+
 // 从指定难度区间随机选择一道题目
 function selectProblemFromRange(minLevel, maxLevel) {
   let availableProblems = [];
@@ -1822,7 +1830,7 @@ function startGame() {
   // 根据心理素质计算心态下降
   let moodDrop = 1 + extraMoodDrop; // 基础心态下降值
   if (playerStats.mental > 0) {
-    moodDrop = Math.max(moodDrop - playerStats.mental, 0);
+    moodDrop = Math.floor(moodDrop * (1 - getMentalDropPercent(playerStats.mental)));
   }
   mood = Math.max(0, mood - moodDrop);
 
@@ -1964,7 +1972,7 @@ function confirmAllocation() {
   playerStats.carefulness = abilityValues.carefulness;
   playerStats.experience = abilityValues.experience;
   playerStats.quickness = abilityValues.quickness;
-  playerStats.mental = abilityValues.mental;
+  playerStats.mental = abilityValues.mental + 2;
   
   // 设置其他属性初始值为0
   playerStats.culture = 0;
@@ -2033,7 +2041,7 @@ function thinkSubProblem(problemIndex, subProblemIndex) {
       let moodDrop = Math.floor(Math.random() * (subProblem.heat + 1));
       if (moodDrop > 0) {
         if (playerStats.mental > 0) {
-          moodDrop = Math.max(moodDrop - playerStats.mental, 0);
+          moodDrop = Math.floor(moodDrop * (1 - getMentalDropPercent(playerStats.mental)));
         }
         mood = Math.max(0, mood - moodDrop);
         logEvent(`由于红温效应，心态值降低${moodDrop}点！`, 'think');
@@ -2083,7 +2091,7 @@ function writeCodeSubProblem(problemIndex, subProblemIndex) {
     if (subProblem.heat > 0) {
       let moodDrop = subProblem.heat;
       if (playerStats.mental > 0) {
-        moodDrop = Math.max(moodDrop - playerStats.mental, 0);
+        moodDrop = Math.floor(moodDrop * (1 - getMentalDropPercent(playerStats.mental)));
       }
       mood = Math.max(0, mood - moodDrop);
       logEvent(`由于红温效应，心态值降低${moodDrop}点！`, 'code');
@@ -2383,7 +2391,7 @@ function showResults() {
           `;
 
   // 比赛结束后的心态恢复
-  const minMoodAfterContest = Math.min(5 + (playerStats.mental || 0), 10);
+  const minMoodAfterContest = Math.min(3 + (playerStats.mental || 0), 10);
   if (mood < minMoodAfterContest) {
     const moodRecovery = minMoodAfterContest - mood;
     mood = minMoodAfterContest;
@@ -2881,12 +2889,12 @@ function startContest(contestType) {
     moodDrop += Math.floor((playerStats.mood - 14) / 2);
   }
   
-  if (playerStats.mental > 0) {
-    moodDrop = Math.max(0, moodDrop - playerStats.mental); // 每点心理素质减少1点心态下降
-  }
+  let newMoodDrop = Math.floor(moodDrop * (1 - getMentalDropPercent(playerStats.mental)));
+  let reducedDrop = moodDrop - newMoodDrop;
+  moodDrop = newMoodDrop;
   mood = Math.max(0, mood - moodDrop);
   document.getElementById("player-mood").textContent = mood;
-  logEvent(`进入考场，心态值-${moodDrop}（心理素质减少了${playerStats.mental || 0}点心态下降），当前心态值：${mood}`, 'event');
+  logEvent(`进入考场，心态值-${moodDrop}（心理素质减少了${reducedDrop}点心态下降），当前心态值：${mood}`, 'event');
   logEvent("请合理分配时间，仔细思考每个部分分。", 'event');
 
   updateStatus();
