@@ -3224,20 +3224,22 @@ function showNextTrainingEvent() {
   const currentEvent = totalTrainingEvents - remainingEvents + 1;
 
   // 根据当前阶段和事件序号决定事件类型
-  if (currentPhase === 1) { // 第一次训练(7次)：【长期训练】【提升训练/比赛训练】【娱乐时间】【提升训练/比赛训练】【考前一天】
+  if (currentPhase === 1) { // 第一次训练(8次)：【长期训练】【长期训练】【提升训练/比赛训练】【娱乐时间】【提升训练/比赛训练】【考前一天】
     if (currentEvent === 1) {
       eventType = "长期训练";
     } else if (currentEvent === 2) {
-      eventType = Math.random() < 0.5 ? "提升训练" : "比赛训练";
+      eventType = "长期训练";
     } else if (currentEvent === 3) {
-      eventType = Math.random() < 0.5 ? "娱乐时间" : "阅读博客";
+      eventType = Math.random() < 0.5 ? "提升训练" : "比赛训练";
     } else if (currentEvent === 4) {
-      eventType = Math.random() < 0.5 ? "提升训练" : "娱乐时间";
+      eventType = Math.random() < 0.5 ? "娱乐时间" : "阅读博客";
     } else if (currentEvent === 5) {
-      eventType = Math.random() < 0.5 ? "焦虑" : "比赛训练";
+      eventType = Math.random() < 0.5 ? "提升训练" : "娱乐时间";
     } else if (currentEvent === 6) {
-      eventType = Math.random() < 0.5 ? "娱乐时间" : "提升训练";
+      eventType = Math.random() < 0.5 ? "焦虑" : "比赛训练";
     } else if (currentEvent === 7) {
+      eventType = Math.random() < 0.5 ? "娱乐时间" : "提升训练";
+    } else if (currentEvent === 8) {
       eventType = "赛前一天";
     }
   } 
