@@ -1999,7 +1999,7 @@ function confirmAllocation() {
 
   // 进入训练事件阶段而不是直接开始故事
 
-  startTrainingEvents(7);
+  startTrainingEvents(8);
 }
 
 // 切换题目
